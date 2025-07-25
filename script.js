@@ -1,9 +1,12 @@
 // Global variables
 let ordersData = [];
 let filteredData = [];
+let currentPage = 1;
+let recordsPerPage = 100;
 let sortColumn = null;
 let sortDirection = "asc";
-const activeIndividualFilters = new Set();
+let selectedDateFrom = "";
+let selectedDateTo = "";
 const bootstrap = window.bootstrap;
 
 // Load data from JSON file
@@ -24,9 +27,8 @@ async function loadData() {
     // Initial render
     renderTable();
     initializeTooltips();
-
-    // Update total records count
     updateRecordCount();
+    updatePagination();
   } catch (error) {
     console.error("Error loading data:", error);
     // Use expanded fallback data
@@ -203,7 +205,7 @@ function loadFallbackData() {
       monetaryValue: 275.0,
       clientId: "startupboss",
       orderLink: "https://www.fiverr.c...",
-      insSheetLink: "https://docs.google...",
+      insSheetLink: "N/A",
       orderStatus: "revision",
       revision: 2,
     },
@@ -293,13 +295,79 @@ function loadFallbackData() {
   renderTable();
   initializeTooltips();
   updateRecordCount();
+  updatePagination();
 }
 
-// Add function to update record count
+// Date Range Picker Functions
+function toggleDateRangePicker() {
+  const dropdown = document.getElementById("dateRangeDropdown");
+  const isVisible = dropdown.style.display === "block";
+
+  // Hide all other dropdowns first
+  document.querySelectorAll(".date-range-dropdown").forEach((d) => {
+    if (d !== dropdown) d.style.display = "none";
+  });
+
+  dropdown.style.display = isVisible ? "none" : "block";
+}
+
+function applyDateRange() {
+  const dateFrom = document.getElementById("dateFrom").value;
+  const dateTo = document.getElementById("dateTo").value;
+
+  selectedDateFrom = dateFrom;
+  selectedDateTo = dateTo;
+
+  // Update the display input
+  const displayInput = document.getElementById("filter-dateRange");
+  if (dateFrom && dateTo) {
+    displayInput.value = `${formatDisplayDate(dateFrom)} - ${formatDisplayDate(
+      dateTo
+    )}`;
+  } else if (dateFrom) {
+    displayInput.value = `From ${formatDisplayDate(dateFrom)}`;
+  } else if (dateTo) {
+    displayInput.value = `Until ${formatDisplayDate(dateTo)}`;
+  } else {
+    displayInput.value = "";
+  }
+
+  // Hide dropdown
+  document.getElementById("dateRangeDropdown").style.display = "none";
+
+  // Apply filters
+  applyFilters();
+}
+
+function clearDateRange() {
+  document.getElementById("dateFrom").value = "";
+  document.getElementById("dateTo").value = "";
+  document.getElementById("filter-dateRange").value = "";
+  selectedDateFrom = "";
+  selectedDateTo = "";
+
+  // Hide dropdown
+  document.getElementById("dateRangeDropdown").style.display = "none";
+
+  // Apply filters
+  applyFilters();
+}
+
+function formatDisplayDate(dateString) {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-US", {
+    month: "2-digit",
+    day: "2-digit",
+    year: "numeric",
+  });
+}
+
+// Update record count
 function updateRecordCount() {
-  const totalRecordsElement = document.getElementById("totalRecords");
-  if (totalRecordsElement) {
-    totalRecordsElement.textContent = filteredData.length;
+  const recordCountElement = document.getElementById("recordCount");
+  if (recordCountElement) {
+    recordCountElement.textContent = `${filteredData.length} records`;
   }
 }
 
@@ -309,7 +377,7 @@ function populateDropdowns() {
   const uniqueAssignBy = [
     ...new Set(ordersData.map((order) => order.assignBy)),
   ];
-  const assignBySelect = document.getElementById("individual-filter-assignBy");
+  const assignBySelect = document.getElementById("filter-assignBy");
   assignBySelect.innerHTML = '<option value="">All</option>';
   uniqueAssignBy.forEach((assignBy) => {
     const option = document.createElement("option");
@@ -317,60 +385,6 @@ function populateDropdowns() {
     option.textContent = assignBy;
     assignBySelect.appendChild(option);
   });
-}
-
-// Handle individual filter icon clicks
-function handleFilterIconClick(column) {
-  // Hide all other individual filter rows
-  document.querySelectorAll(".individual-filter-row").forEach((row) => {
-    if (row.id !== `filter-row-${column}`) {
-      row.style.display = "none";
-    }
-  });
-
-  // Toggle the clicked filter row
-  const filterRow = document.getElementById(`filter-row-${column}`);
-  if (filterRow.style.display === "none") {
-    filterRow.style.display = "table-row";
-
-    // Focus on the first input in the filter row
-    setTimeout(() => {
-      const firstInput = filterRow.querySelector(".individual-filter-input");
-      if (firstInput) {
-        firstInput.focus();
-      }
-    }, 100);
-  } else {
-    filterRow.style.display = "none";
-  }
-}
-
-// Clear individual filter
-function clearIndividualFilter(column) {
-  // Clear the filter inputs for this column
-  if (column === "date") {
-    document.getElementById("individual-filter-date").value = "";
-  } else if (column === "monetaryValue") {
-    document.getElementById("individual-filter-valueMin").value = "";
-    document.getElementById("individual-filter-valueMax").value = "";
-  } else {
-    const input = document.getElementById(`individual-filter-${column}`);
-    if (input) {
-      input.value = "";
-    }
-  }
-
-  // Hide the filter row
-  const filterRow = document.getElementById(`filter-row-${column}`);
-  if (filterRow) {
-    filterRow.style.display = "none";
-  }
-
-  // Remove from active filters
-  activeIndividualFilters.delete(column);
-
-  // Apply filters
-  applyFilters();
 }
 
 // Get status badge HTML with appropriate styling
@@ -419,7 +433,9 @@ function sortData(column) {
   });
 
   updateSortIcons();
+  currentPage = 1; // Reset to first page after sorting
   renderTable();
+  updatePagination();
 }
 
 // Update sort icons in headers
@@ -452,58 +468,12 @@ function updateSortIcons() {
   }
 }
 
-// Update filter icon states
-function updateFilterIcons() {
-  // Reset all filter icons
-  document.querySelectorAll(".filter-icon").forEach((icon) => {
-    icon.classList.remove("active", "filter-active");
-  });
-
-  activeIndividualFilters.clear();
-
-  // Check which individual filters are active
-  const filterChecks = [
-    { id: "individual-filter-id", column: "id" },
-    { id: "individual-filter-date", column: "date" },
-    { id: "individual-filter-assignBy", column: "assignBy" },
-    { id: "individual-filter-employeeId", column: "employeeId" },
-    { id: "individual-filter-employeeName", column: "employeeName" },
-    { id: "individual-filter-assignTeam", column: "assignTeam" },
-    { id: "individual-filter-profileName", column: "profileName" },
-    { id: "individual-filter-orderId", column: "orderId" },
-    { id: "individual-filter-valueMin", column: "monetaryValue" },
-    { id: "individual-filter-valueMax", column: "monetaryValue" },
-    { id: "individual-filter-clientId", column: "clientId" },
-    { id: "individual-filter-orderLink", column: "orderLink" },
-    { id: "individual-filter-insSheetLink", column: "insSheetLink" },
-    { id: "individual-filter-orderStatus", column: "orderStatus" },
-    { id: "individual-filter-revision", column: "revision" },
-  ];
-
-  filterChecks.forEach(({ id, column }) => {
-    const element = document.getElementById(id);
-    if (element && element.value) {
-      activeIndividualFilters.add(column);
-    }
-  });
-
-  // Add active class to filter icons
-  activeIndividualFilters.forEach((column) => {
-    const filterIcon = document.querySelector(
-      `.filter-icon[data-column="${column}"]`
-    );
-    if (filterIcon) {
-      filterIcon.classList.add("active", "filter-active");
-    }
-  });
-}
-
-// Render table with data
-function renderTable(data = filteredData) {
+// Render table with data and pagination
+function renderTable() {
   const tbody = document.getElementById("orderTableBody");
   tbody.innerHTML = "";
 
-  if (data.length === 0) {
+  if (filteredData.length === 0) {
     tbody.innerHTML = `
       <tr>
         <td colspan="14" class="no-data">
@@ -515,7 +485,12 @@ function renderTable(data = filteredData) {
     return;
   }
 
-  data.forEach((order) => {
+  // Calculate pagination
+  const startIndex = (currentPage - 1) * recordsPerPage;
+  const endIndex = Math.min(startIndex + recordsPerPage, filteredData.length);
+  const pageData = filteredData.slice(startIndex, endIndex);
+
+  pageData.forEach((order) => {
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${order.id}</td>
@@ -553,171 +528,256 @@ function formatDate(dateString) {
   });
 }
 
-// Update statistics cards
-function updateStats(data) {
-  // Function removed as stats cards are no longer present
-}
-
-// Update the applyFilters function to remove top filters and fix date filtering
+// Apply filters
 function applyFilters() {
-  // Individual column filters only
-  const individualFilterId = document
-    .getElementById("individual-filter-id")
+  // Get all filter values
+  const filterId = document.getElementById("filter-id").value.toLowerCase();
+  const filterAssignBy = document.getElementById("filter-assignBy").value;
+  const filterEmployeeId = document
+    .getElementById("filter-employeeId")
     .value.toLowerCase();
-  const individualFilterDate = document.getElementById(
-    "individual-filter-date"
-  ).value;
-  const individualFilterAssignBy = document.getElementById(
-    "individual-filter-assignBy"
-  ).value;
-  const individualFilterEmployeeId = document
-    .getElementById("individual-filter-employeeId")
+  const filterEmployeeName = document
+    .getElementById("filter-employeeName")
     .value.toLowerCase();
-  const individualFilterEmployeeName = document
-    .getElementById("individual-filter-employeeName")
+  const filterAssignTeam = document.getElementById("filter-assignTeam").value;
+  const filterProfileName = document.getElementById("filter-profileName").value;
+  const filterOrderId = document
+    .getElementById("filter-orderId")
     .value.toLowerCase();
-  const individualFilterAssignTeam = document.getElementById(
-    "individual-filter-assignTeam"
-  ).value;
-  const individualFilterProfileName = document.getElementById(
-    "individual-filter-profileName"
-  ).value;
-  const individualFilterOrderId = document
-    .getElementById("individual-filter-orderId")
+  const filterValueMin = document.getElementById("filter-valueMin").value;
+  const filterValueMax = document.getElementById("filter-valueMax").value;
+  const filterClientId = document
+    .getElementById("filter-clientId")
     .value.toLowerCase();
-  const individualFilterValueMin = document.getElementById(
-    "individual-filter-valueMin"
-  ).value;
-  const individualFilterValueMax = document.getElementById(
-    "individual-filter-valueMax"
-  ).value;
-  const individualFilterClientId = document
-    .getElementById("individual-filter-clientId")
+  const filterOrderLink = document
+    .getElementById("filter-orderLink")
     .value.toLowerCase();
-  const individualFilterOrderLink = document
-    .getElementById("individual-filter-orderLink")
+  const filterInsSheetLink = document
+    .getElementById("filter-insSheetLink")
     .value.toLowerCase();
-  const individualFilterInsSheetLink = document
-    .getElementById("individual-filter-insSheetLink")
-    .value.toLowerCase();
-  const individualFilterOrderStatus = document.getElementById(
-    "individual-filter-orderStatus"
-  ).value;
-  const individualFilterRevision = document.getElementById(
-    "individual-filter-revision"
-  ).value;
+  const filterOrderStatus = document.getElementById("filter-orderStatus").value;
+  const filterRevision = document.getElementById("filter-revision").value;
 
   filteredData = ordersData.filter((order) => {
     let matches = true;
 
-    // Individual column filters (multiple filters work together with AND logic)
-    if (individualFilterId) {
-      matches = matches && order.id.toLowerCase().includes(individualFilterId);
+    // Apply all filters with AND logic
+    if (filterId) {
+      matches = matches && order.id.toLowerCase().includes(filterId);
     }
 
-    // Single date filter - exact date match
-    if (individualFilterDate) {
-      matches = matches && order.date === individualFilterDate;
+    // Date range filter using global variables
+    if (selectedDateFrom || selectedDateTo) {
+      const orderDate = order.date; // Order date in YYYY-MM-DD format
+
+      if (selectedDateFrom && selectedDateTo) {
+        // Both from and to are set - filter by range
+        matches =
+          matches &&
+          orderDate >= selectedDateFrom &&
+          orderDate <= selectedDateTo;
+      } else if (selectedDateFrom) {
+        // Only from is set - filter from that date onwards
+        matches = matches && orderDate >= selectedDateFrom;
+      } else if (selectedDateTo) {
+        // Only to is set - filter up to that date
+        matches = matches && orderDate <= selectedDateTo;
+      }
     }
 
-    if (individualFilterAssignBy) {
-      matches = matches && order.assignBy === individualFilterAssignBy;
+    if (filterAssignBy) {
+      matches = matches && order.assignBy === filterAssignBy;
     }
 
-    if (individualFilterEmployeeId) {
+    if (filterEmployeeId) {
+      matches =
+        matches && order.employeeId.toLowerCase().includes(filterEmployeeId);
+    }
+
+    if (filterEmployeeName) {
       matches =
         matches &&
-        order.employeeId.toLowerCase().includes(individualFilterEmployeeId);
+        order.employeeName.toLowerCase().includes(filterEmployeeName);
     }
 
-    if (individualFilterEmployeeName) {
+    if (filterAssignTeam) {
+      matches = matches && order.assignTeam === filterAssignTeam;
+    }
+
+    if (filterProfileName) {
+      matches = matches && order.profileName === filterProfileName;
+    }
+
+    if (filterOrderId) {
+      matches = matches && order.orderId.toLowerCase().includes(filterOrderId);
+    }
+
+    if (filterValueMin) {
+      matches =
+        matches && order.monetaryValue >= Number.parseFloat(filterValueMin);
+    }
+
+    if (filterValueMax) {
+      matches =
+        matches && order.monetaryValue <= Number.parseFloat(filterValueMax);
+    }
+
+    if (filterClientId) {
+      matches =
+        matches && order.clientId.toLowerCase().includes(filterClientId);
+    }
+
+    if (filterOrderLink) {
+      matches =
+        matches && order.orderLink.toLowerCase().includes(filterOrderLink);
+    }
+
+    if (filterInsSheetLink) {
       matches =
         matches &&
-        order.employeeName.toLowerCase().includes(individualFilterEmployeeName);
+        order.insSheetLink.toLowerCase().includes(filterInsSheetLink);
     }
 
-    if (individualFilterAssignTeam) {
-      matches = matches && order.assignTeam === individualFilterAssignTeam;
+    if (filterOrderStatus) {
+      matches = matches && order.orderStatus === filterOrderStatus;
     }
 
-    if (individualFilterProfileName) {
-      matches = matches && order.profileName === individualFilterProfileName;
-    }
-
-    if (individualFilterOrderId) {
-      matches =
-        matches &&
-        order.orderId.toLowerCase().includes(individualFilterOrderId);
-    }
-
-    if (individualFilterValueMin) {
-      matches =
-        matches &&
-        order.monetaryValue >= Number.parseFloat(individualFilterValueMin);
-    }
-
-    if (individualFilterValueMax) {
-      matches =
-        matches &&
-        order.monetaryValue <= Number.parseFloat(individualFilterValueMax);
-    }
-
-    if (individualFilterClientId) {
-      matches =
-        matches &&
-        order.clientId.toLowerCase().includes(individualFilterClientId);
-    }
-
-    if (individualFilterOrderLink) {
-      matches =
-        matches &&
-        order.orderLink.toLowerCase().includes(individualFilterOrderLink);
-    }
-
-    if (individualFilterInsSheetLink) {
-      matches =
-        matches &&
-        order.insSheetLink.toLowerCase().includes(individualFilterInsSheetLink);
-    }
-
-    if (individualFilterOrderStatus) {
-      matches = matches && order.orderStatus === individualFilterOrderStatus;
-    }
-
-    if (individualFilterRevision) {
-      matches =
-        matches && order.revision === Number.parseInt(individualFilterRevision);
+    if (filterRevision) {
+      matches = matches && order.revision === Number.parseInt(filterRevision);
     }
 
     return matches;
   });
 
-  updateFilterIcons();
-  renderTable(filteredData);
+  currentPage = 1; // Reset to first page after filtering
+  updateRecordCount();
+  renderTable();
+  updatePagination();
 }
 
 // Clear all filters
 function clearAllFilters() {
-  // Clear all individual filters
-  document.querySelectorAll(".individual-filter-input").forEach((input) => {
+  // Clear all filter inputs
+  document.querySelectorAll(".header-filter").forEach((input) => {
     input.value = "";
   });
 
-  // Hide all individual filter rows
-  document.querySelectorAll(".individual-filter-row").forEach((row) => {
-    row.style.display = "none";
-  });
+  // Clear date range
+  selectedDateFrom = "";
+  selectedDateTo = "";
+  document.getElementById("dateFrom").value = "";
+  document.getElementById("dateTo").value = "";
+  document.getElementById("filter-dateRange").value = "";
 
-  // Reset data and sorting
+  // Reset data
   filteredData = [...ordersData];
-  activeIndividualFilters.clear();
-  updateFilterIcons();
-  renderTable(filteredData);
+  currentPage = 1;
+  updateRecordCount();
+  renderTable();
+  updatePagination();
 }
 
 // Cancel all filters (same as clear but with different name for the red button)
 function cancelAllFilters() {
   clearAllFilters();
+}
+
+// Update pagination
+function updatePagination() {
+  const totalRecords = filteredData.length;
+  const totalPages = Math.ceil(totalRecords / recordsPerPage);
+  const startRecord =
+    totalRecords === 0 ? 0 : (currentPage - 1) * recordsPerPage + 1;
+  const endRecord = Math.min(currentPage * recordsPerPage, totalRecords);
+
+  // Update pagination info
+  const paginationInfo = document.getElementById("paginationInfo");
+  paginationInfo.textContent = `Showing ${startRecord}-${endRecord} of ${totalRecords} records`;
+
+  // Generate pagination buttons
+  const paginationNav = document.getElementById("paginationNav");
+  paginationNav.innerHTML = "";
+
+  if (totalPages <= 1) {
+    return; // No pagination needed
+  }
+
+  // Previous button
+  const prevLi = document.createElement("li");
+  prevLi.className = `page-item ${currentPage === 1 ? "disabled" : ""}`;
+  prevLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${
+    currentPage - 1
+  })">Previous</a>`;
+  paginationNav.appendChild(prevLi);
+
+  // Page numbers
+  const startPage = Math.max(1, currentPage - 2);
+  const endPage = Math.min(totalPages, currentPage + 2);
+
+  if (startPage > 1) {
+    const firstLi = document.createElement("li");
+    firstLi.className = "page-item";
+    firstLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(1)">1</a>`;
+    paginationNav.appendChild(firstLi);
+
+    if (startPage > 2) {
+      const ellipsisLi = document.createElement("li");
+      ellipsisLi.className = "page-item disabled";
+      ellipsisLi.innerHTML = `<span class="page-link">...</span>`;
+      paginationNav.appendChild(ellipsisLi);
+    }
+  }
+
+  for (let i = startPage; i <= endPage; i++) {
+    const pageLi = document.createElement("li");
+    pageLi.className = `page-item ${i === currentPage ? "active" : ""}`;
+    pageLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${i})">${i}</a>`;
+    paginationNav.appendChild(pageLi);
+  }
+
+  if (endPage < totalPages) {
+    if (endPage < totalPages - 1) {
+      const ellipsisLi = document.createElement("li");
+      ellipsisLi.className = "page-item disabled";
+      ellipsisLi.innerHTML = `<span class="page-link">...</span>`;
+      paginationNav.appendChild(ellipsisLi);
+    }
+
+    const lastLi = document.createElement("li");
+    lastLi.className = "page-item";
+    lastLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${totalPages})">${totalPages}</a>`;
+    paginationNav.appendChild(lastLi);
+  }
+
+  // Next button
+  const nextLi = document.createElement("li");
+  nextLi.className = `page-item ${
+    currentPage === totalPages ? "disabled" : ""
+  }`;
+  nextLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${
+    currentPage + 1
+  })">Next</a>`;
+  paginationNav.appendChild(nextLi);
+}
+
+// Change page
+function changePage(page) {
+  const totalPages = Math.ceil(filteredData.length / recordsPerPage);
+  if (page >= 1 && page <= totalPages) {
+    currentPage = page;
+    renderTable();
+    updatePagination();
+  }
+}
+
+// Change records per page
+function changeRecordsPerPage() {
+  recordsPerPage = Number.parseInt(
+    document.getElementById("recordsPerPage").value
+  );
+  currentPage = 1;
+  renderTable();
+  updatePagination();
 }
 
 // Debounce function for search inputs
@@ -735,10 +795,10 @@ function debounce(func, wait) {
 
 // Initialize event listeners
 function initializeEventListeners() {
-  // Individual column filters with debounce for text inputs
+  // Header filters with debounce for text inputs
   const debouncedFilter = debounce(applyFilters, 300);
 
-  document.querySelectorAll(".individual-filter-input").forEach((input) => {
+  document.querySelectorAll(".header-filter").forEach((input) => {
     if (input.type === "text" || input.type === "number") {
       input.addEventListener("input", debouncedFilter);
     } else {
@@ -746,24 +806,40 @@ function initializeEventListeners() {
     }
   });
 
+  // Date range picker click handler
+  document
+    .getElementById("filter-dateRange")
+    .addEventListener("click", toggleDateRangePicker);
+
+  // Close dropdown when clicking outside
+  document.addEventListener("click", (event) => {
+    const dateRangeContainer = document.querySelector(
+      ".date-range-picker-container"
+    );
+    const dropdown = document.getElementById("dateRangeDropdown");
+
+    if (!dateRangeContainer.contains(event.target)) {
+      dropdown.style.display = "none";
+    }
+  });
+
+  // Records per page dropdown
+  document
+    .getElementById("recordsPerPage")
+    .addEventListener("change", changeRecordsPerPage);
+
   // Sorting functionality
   document.querySelectorAll(".sortable").forEach((th) => {
     th.addEventListener("click", (e) => {
-      // Don't sort if clicking on filter icon
-      if (e.target.classList.contains("filter-icon")) {
+      // Don't sort if clicking on filter input or date range picker
+      if (
+        e.target.classList.contains("header-filter") ||
+        e.target.closest(".date-range-picker-container")
+      ) {
         return;
       }
       const column = th.getAttribute("data-column");
       sortData(column);
-    });
-  });
-
-  // Filter icon clicks
-  document.querySelectorAll(".filter-icon").forEach((icon) => {
-    icon.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const column = icon.getAttribute("data-column");
-      handleFilterIconClick(column);
     });
   });
 }
@@ -785,8 +861,10 @@ window.OrderManagement = {
   applyFilters,
   clearAllFilters,
   renderTable,
-  updateStats,
   sortData,
-  handleFilterIconClick,
-  clearIndividualFilter,
+  changePage,
+  changeRecordsPerPage,
+  toggleDateRangePicker,
+  applyDateRange,
+  clearDateRange,
 };

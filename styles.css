@@ -3,45 +3,6 @@ body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.header-section {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.stats-card {
-  background: white;
-  border-radius: 8px;
-  padding: 20px;
-  text-align: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-}
-
-.stats-card h3 {
-  font-size: 1.8rem;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.stats-card .subtitle {
-  color: #6c757d;
-  font-size: 0.9rem;
-}
-
-.stats-icon {
-  width: 60px;
-  height: 60px;
-  background: #e9ecef;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 15px;
-}
-
 .table-container {
   background: white;
   border-radius: 8px;
@@ -55,9 +16,10 @@ body {
   border: none;
   font-weight: 600;
   font-size: 0.85rem;
-  padding: 8px;
+  padding: 12px 8px;
   white-space: nowrap;
   vertical-align: top;
+  min-width: 150px;
 }
 
 .table td {
@@ -75,53 +37,41 @@ body {
   background-color: #f8f9fa;
 }
 
-/* Header with sorting and filter icons */
+/* Header with inline filters */
 .header-row th {
   position: relative;
-  padding: 12px 8px 8px 8px;
+  padding: 12px 8px;
 }
 
 .header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.header-title {
   display: flex;
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
   user-select: none;
+  font-weight: 600;
 }
 
-.header-icons {
-  display: flex;
-  align-items: center;
-  gap: 5px;
+.header-title span {
+  flex: 1;
 }
 
-.sortable:hover {
-  background-color: #e9ecef;
+.sortable:hover .header-title {
+  background-color: rgba(0, 123, 255, 0.1);
+  border-radius: 4px;
+  padding: 2px 4px;
 }
 
 .sort-icon {
   font-size: 0.7rem;
   color: #6c757d;
   margin-left: 5px;
-}
-
-.filter-icon {
-  font-size: 0.7rem;
-  color: #007bff;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  padding: 2px;
-  border-radius: 3px;
-}
-
-.filter-icon:hover {
-  color: #0056b3;
-  background-color: rgba(0, 123, 255, 0.1);
-}
-
-.filter-icon.active {
-  color: #28a745;
-  background-color: rgba(40, 167, 69, 0.1);
 }
 
 .sort-asc .sort-icon {
@@ -132,40 +82,104 @@ body {
   color: #007bff;
 }
 
-/* Individual Filter Rows */
-.individual-filter-row {
-  background-color: #f8f9fa;
-  border-top: 2px solid #007bff;
+/* Header filters */
+.header-filter {
+  font-size: 0.75rem;
+  height: 28px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 4px 8px;
 }
 
-.individual-filter-row th {
-  padding: 15px;
-  background-color: #f8f9fa;
+.header-filter:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.1rem rgba(0, 123, 255, 0.25);
+  outline: none;
 }
 
-.individual-filter-container {
+.header-filter::placeholder {
+  color: #6c757d;
+  font-size: 0.7rem;
+}
+
+/* Value filter container for min/max inputs */
+.value-filter-container {
+  display: flex;
+  gap: 4px;
+}
+
+.value-filter-container .header-filter {
+  flex: 1;
+  min-width: 60px;
+}
+
+/* Date Range Picker Styles */
+.date-range-picker-container {
+  position: relative;
+}
+
+.date-range-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  padding: 12px;
+  min-width: 280px;
+}
+
+.date-range-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.date-input-group {
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.filter-label {
+.date-label {
+  font-size: 0.75rem;
   font-weight: 600;
   color: #495057;
+  min-width: 40px;
   margin-bottom: 0;
-  min-width: 120px;
 }
 
-.individual-filter-input {
-  font-size: 0.85rem;
-  height: 32px;
-  min-width: 200px;
+.date-input-group input {
+  flex: 1;
+  font-size: 0.75rem;
+  height: 28px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 4px 8px;
 }
 
-.individual-filter-input:focus {
+.date-input-group input:focus {
   border-color: #007bff;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  box-shadow: 0 0 0 0.1rem rgba(0, 123, 255, 0.25);
+  outline: none;
+}
+
+.date-range-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.date-range-actions .btn {
+  font-size: 0.75rem;
+  padding: 4px 12px;
+  height: 28px;
+  line-height: 1.2;
 }
 
 /* Status badges */
@@ -206,7 +220,7 @@ body {
   color: #721c24;
 }
 
-/* Add revision badge styling */
+/* Revision badge styling */
 .revision-badge {
   padding: 4px 8px;
   border-radius: 4px;
@@ -219,29 +233,6 @@ body {
 
 .revision-badge:hover {
   transform: scale(1.05);
-}
-
-.filter-section {
-  background: white;
-  padding: 15px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.btn-primary {
-  background-color: #495057;
-  border-color: #495057;
-}
-
-.btn-primary:hover {
-  background-color: #343a40;
-  border-color: #343a40;
-}
-
-.form-select,
-.form-control {
-  font-size: 0.9rem;
 }
 
 .table-responsive {
@@ -265,46 +256,104 @@ body {
   text-decoration: underline;
 }
 
+/* Header controls styling */
+.btn-xs {
+  padding: 0.15rem 0.5rem;
+  font-size: 0.7rem;
+  line-height: 1.2;
+  border-radius: 0.2rem;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+  border-color: #bd2130;
+  color: white;
+}
+
+/* Pagination styling */
+.pagination-sm .page-link {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.pagination-info {
+  display: flex;
+  align-items: center;
+}
+
+.badge {
+  font-size: 0.8rem;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .container-fluid {
     padding: 10px;
   }
 
-  .stats-card {
-    margin-bottom: 15px;
-  }
-
   .table-responsive {
     font-size: 0.8rem;
   }
 
-  .filter-section .row {
-    gap: 10px;
+  .header-filter {
+    font-size: 0.7rem;
+    height: 24px;
+    min-width: 80px;
   }
 
-  .individual-filter-input {
-    font-size: 0.75rem;
-    height: 28px;
-    min-width: 150px;
+  .table th {
+    min-width: 120px;
+    padding: 8px 4px;
+  }
+
+  .table td {
+    padding: 8px 4px;
   }
 
   .header-content {
+    gap: 4px;
+  }
+
+  .value-filter-container {
     flex-direction: column;
-    align-items: flex-start;
     gap: 2px;
   }
 
-  .header-icons {
-    align-self: flex-end;
+  /* Stack header controls on mobile */
+  .d-flex.justify-content-between {
+    flex-direction: column;
+    gap: 10px;
   }
 
-  .individual-filter-container {
+  .d-flex.align-items-center.gap-3 {
+    flex-wrap: wrap;
+    gap: 10px !important;
+  }
+
+  /* Mobile date range dropdown */
+  .date-range-dropdown {
+    min-width: 250px;
+    left: -50px;
+  }
+
+  .date-input-group {
     flex-direction: column;
     align-items: flex-start;
+    gap: 4px;
   }
 
-  .filter-label {
+  .date-label {
     min-width: auto;
   }
 }
@@ -335,27 +384,19 @@ body {
   background: #a8a8a8;
 }
 
-/* Animation for status badges */
-.status-badge {
-  transition: all 0.2s ease;
-}
-
-.status-badge:hover {
-  transform: scale(1.05);
-}
-
 /* Focus styles */
 .form-control:focus,
 .form-select:focus {
-  border-color: #495057;
-  box-shadow: 0 0 0 0.2rem rgba(73, 80, 87, 0.25);
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
 /* Print styles */
 @media print {
-  .filter-section,
   .btn,
-  .individual-filter-row {
+  .pagination,
+  .header-filter,
+  .date-range-dropdown {
     display: none !important;
   }
 
@@ -373,12 +414,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 10;
-}
-
-.individual-filter-row th {
-  position: sticky;
-  top: 45px;
-  z-index: 9;
+  background-color: #f8f9fa;
 }
 
 /* No data message */
@@ -399,93 +435,42 @@ body {
   font-size: 0.75rem;
 }
 
-/* Header spacing */
-.header-content span {
-  margin-right: 8px;
+/* Animation for status badges */
+.status-badge {
+  transition: all 0.2s ease;
 }
 
-/* Filter animation */
-.individual-filter-row {
-  transition: all 0.3s ease;
+.status-badge:hover {
+  transform: scale(1.05);
 }
 
-/* Active filter indicator */
-.filter-active {
-  position: relative;
-}
-
-.filter-active::after {
-  content: "";
-  position: absolute;
-  top: -2px;
-  right: -2px;
-  width: 6px;
-  height: 6px;
-  background-color: #28a745;
-  border-radius: 50%;
-}
-
-/* Add styles for record count display */
-.record-count {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 38px;
-}
-
-.record-count .badge {
-  padding: 8px 12px;
-  font-size: 0.9rem;
-}
-
-.btn-danger {
-  background-color: #dc3545;
-  border-color: #dc3545;
-  color: white;
-}
-
-.btn-danger:hover {
-  background-color: #c82333;
-  border-color: #bd2130;
-  color: white;
-}
-
-.btn-danger:focus {
-  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
-}
-
-.table-header-section {
+/* Pagination container */
+#paginationContainer {
   background: white;
   padding: 15px;
-  border-radius: 8px 8px 0 0;
-  border-bottom: 1px solid #e9ecef;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Keep the individual date input styling: */
-.individual-filter-input[type="date"] {
-  min-width: 150px;
+/* Records per page dropdown styling */
+#recordsPerPage {
+  min-width: 80px;
+}
+
+/* Header layout improvements */
+.d-flex.justify-content-between.align-items-center {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+/* Date range picker cursor */
+#filter-dateRange {
   cursor: pointer;
 }
 
-.individual-filter-input[type="date"]::-webkit-calendar-picker-indicator {
-  cursor: pointer;
-  padding: 2px;
-  border-radius: 3px;
-  transition: background-color 0.2s ease;
-}
-
-.individual-filter-input[type="date"]::-webkit-calendar-picker-indicator:hover {
-  background-color: rgba(0, 123, 255, 0.1);
-}
-/* Responsive date picker */
-@media (max-width: 768px) {
-  .date-picker-container {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 5px;
-  }
-
-  .individual-filter-input[type="date"] {
-    min-width: 120px;
-  }
+#filter-dateRange:hover {
+  background-color: #f8f9fa;
 }
