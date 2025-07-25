@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid px-4 py-3">
+        <!-- Table with Header Filters -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="mb-0">Order Management Table</h4>
+            <button class="btn btn-danger" onclick="cancelAllFilters()">
+                <i class="fas fa-times me-2"></i>Cancel All Filters
+            </button>
+        </div>
+        <div class="table-container">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr class="header-row">
+                            <th class="sortable" data-column="id">
+                                <div class="header-content">
+                                    <span>ID</span>
+                                    <div class="header-icons">
+                                        <i class="fas fa-search filter-icon" data-column="id" data-bs-toggle="tooltip" title="Search ID"></i>
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </div>
+                                </div>
+                            </th>
+                            <th class="sortable" data-column="date">
+                                <div class="header-content">
+                                    <span>Date</span>
+                                    <div class="header-icons">
+                                        <i class="fas fa-calendar-alt filter-icon" data-column="date" data-bs-toggle="tooltip" title="Filter by Date"></i>
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </div>
+                                </div>
+                            </th>
+                            <th class="sortable" data-column="assignBy">
+                                <div class="header-content">
+                                    <span>Assign By</span>
+                                    <div class="header-icons">
+                                        <i class="fas fa-filter filter-icon" data-column="assignBy" data-bs-toggle="tooltip" title="Filter by Assign By"></i>
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </div>
+                                </div>
+                            </th>
+                            <th class="sortable" data-column="employeeId">
+                                <div class="header-content">
+                                    <span>Employee ID</span>
+                                    <div class="header-icons">
+                                        <i class="fas fa-search filter-icon" data-column="employeeId" data-bs-toggle="tooltip" title="Search Employee ID"></i>
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </div>
+                                </div>
+                            </th>
+                            <th class="sortable" data-column="employeeName">
+                                <div class="header-content">
+                                    <span>Employee Name</span>
+                                    <div class="header-icons">
+                                        <i class="fas fa-search filter-icon" data-column="employeeName" data-bs-toggle="tooltip" title="Search Employee Name"></i>
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </div>
+                                </div>
+                            </th>
+                            <th class="sortable" data-column="assignTeam">
+                                <div class="header-content">
+                                    <span>Assign Team</span>
+                                    <div class="header-icons">
+                                        <i class="fas fa-filter filter-icon" data-column="assignTeam" data-bs-toggle="tooltip" title="Filter by Team"></i>
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </div>
+                                </div>
+                            </th>
+                            <th class="sortable" data-column="profileName">
+                                <div class="header-content">
+                                    <span>Profile Name</span>
+                                    <div class="header-icons">
+                                        <i class="fas fa-user filter-icon" data-column="profileName" data-bs-toggle="tooltip" title="Filter by Profile"></i>
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </div>
+                                </div>
+                            </th>
+                            <th class="sortable" data-column="orderId">
+                                <div class="header-content">
+                                    <span>Order ID</span>
+                                    <div class="header-icons">
+                                        <i class="fas fa-search filter-icon" data-column="orderId" data-bs-toggle="tooltip" title="Search Order ID"></i>
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </div>
+                                </div>
+                            </th>
+                            <th class="sortable" data-column="monetaryValue">
+                                <div class="header-content">
+                                    <span>Monetary Value</span>
+                                    <div class="header-icons">
+                                        <i class="fas fa-dollar-sign filter-icon" data-column="monetaryValue" data-bs-toggle="tooltip" title="Filter by Value Range"></i>
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </div>
+                                </div>
+                            </th>
+                            <th class="sortable" data-column="clientId">
+                                <div class="header-content">
+                                    <span>Client ID</span>
+                                    <div class="header-icons">
+                                        <i class="fas fa-search filter-icon" data-column="clientId" data-bs-toggle="tooltip" title="Search Client ID"></i>
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </div>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="header-content">
+                                    <span>Order Link</span>
+                                    <div class="header-icons">
+                                        <i class="fas fa-link filter-icon" data-column="orderLink" data-bs-toggle="tooltip" title="Search Order Link"></i>
+                                    </div>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="header-content">
+                                    <span>Ins. Sheet Link</span>
+                                    <div class="header-icons">
+                                        <i class="fas fa-link filter-icon" data-column="insSheetLink" data-bs-toggle="tooltip" title="Search Sheet Link"></i>
+                                    </div>
+                                </div>
+                            </th>
+                            <th class="sortable" data-column="orderStatus">
+                                <div class="header-content">
+                                    <span>Order Status</span>
+                                    <div class="header-icons">
+                                        <i class="fas fa-tags filter-icon" data-column="orderStatus" data-bs-toggle="tooltip" title="Filter by Status"></i>
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </div>
+                                </div>
+                            </th>
+                            <th class="sortable" data-column="revision">
+                                <div class="header-content">
+                                    <span>Revision</span>
+                                    <div class="header-icons">
+                                        <i class="fas fa-hashtag filter-icon" data-column="revision" data-bs-toggle="tooltip" title="Filter by Revision"></i>
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </div>
+                                </div>
+                            </th>
+                        </tr>
+                        <!-- Individual Filter Rows (Initially Hidden) -->
+                        <tr class="individual-filter-row" id="filter-row-id" style="display: none;">
+                            <th colspan="14">
+                                <div class="individual-filter-container">
+                                    <label class="filter-label">Search ID:</label>
+                                    <input type="text" class="form-control form-control-sm individual-filter-input" 
+                                           id="individual-filter-id" placeholder="Enter ID to search">
+                                    <button class="btn btn-sm btn-outline-secondary ms-2" onclick="clearIndividualFilter('id')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </th>
+                        </tr>
+                        <tr class="individual-filter-row" id="filter-row-date" style="display: none;">
+                            <th colspan="14">
+                                <div class="individual-filter-container">
+                                    <label class="filter-label">Filter by Date:</label>
+                                    <input type="date" class="form-control form-control-sm individual-filter-input" 
+                                           id="individual-filter-date" placeholder="Select Date">
+                                    <button class="btn btn-sm btn-outline-secondary ms-2" onclick="clearIndividualFilter('date')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </th>
+                        </tr>
+                        <tr class="individual-filter-row" id="filter-row-assignBy" style="display: none;">
+                            <th colspan="14">
+                                <div class="individual-filter-container">
+                                    <label class="filter-label">Assign By:</label>
+                                    <select class="form-select form-select-sm individual-filter-input" id="individual-filter-assignBy">
+                                        <option value="">All</option>
+                                    </select>
+                                    <button class="btn btn-sm btn-outline-secondary ms-2" onclick="clearIndividualFilter('assignBy')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </th>
+                        </tr>
+                        <tr class="individual-filter-row" id="filter-row-employeeId" style="display: none;">
+                            <th colspan="14">
+                                <div class="individual-filter-container">
+                                    <label class="filter-label">Search Employee ID:</label>
+                                    <input type="text" class="form-control form-control-sm individual-filter-input" 
+                                           id="individual-filter-employeeId" placeholder="Enter Employee ID">
+                                    <button class="btn btn-sm btn-outline-secondary ms-2" onclick="clearIndividualFilter('employeeId')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </th>
+                        </tr>
+                        <tr class="individual-filter-row" id="filter-row-employeeName" style="display: none;">
+                            <th colspan="14">
+                                <div class="individual-filter-container">
+                                    <label class="filter-label">Search Employee Name:</label>
+                                    <input type="text" class="form-control form-control-sm individual-filter-input" 
+                                           id="individual-filter-employeeName" placeholder="Enter Employee Name">
+                                    <button class="btn btn-sm btn-outline-secondary ms-2" onclick="clearIndividualFilter('employeeName')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </th>
+                        </tr>
+                        <tr class="individual-filter-row" id="filter-row-assignTeam" style="display: none;">
+                            <th colspan="14">
+                                <div class="individual-filter-container">
+                                    <label class="filter-label">Assign Team:</label>
+                                    <select class="form-select form-select-sm individual-filter-input" id="individual-filter-assignTeam">
+                                        <option value="">All Teams</option>
+                                        <option value="Dev-X">Dev-X</option>
+                                        <option value="Nex-Tier">Nex-Tier</option>
+                                        <option value="Elite-Stack">Elite-Stack</option>
+                                        <option value="Dart Layer">Dart Layer</option>
+                                    </select>
+                                    <button class="btn btn-sm btn-outline-secondary ms-2" onclick="clearIndividualFilter('assignTeam')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </th>
+                        </tr>
+                        <tr class="individual-filter-row" id="filter-row-profileName" style="display: none;">
+                            <th colspan="14">
+                                <div class="individual-filter-container">
+                                    <label class="filter-label">Profile Name:</label>
+                                    <select class="form-select form-select-sm individual-filter-input" id="individual-filter-profileName">
+                                        <option value="">All Profiles</option>
+                                        <option value="semexpert_">semexpert_</option>
+                                        <option value="adsfrenzy">adsfrenzy</option>
+                                        <option value="ibrahim_365">ibrahim_365</option>
+                                    </select>
+                                    <button class="btn btn-sm btn-outline-secondary ms-2" onclick="clearIndividualFilter('profileName')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </th>
+                        </tr>
+                        <tr class="individual-filter-row" id="filter-row-orderId" style="display: none;">
+                            <th colspan="14">
+                                <div class="individual-filter-container">
+                                    <label class="filter-label">Search Order ID:</label>
+                                    <input type="text" class="form-control form-control-sm individual-filter-input" 
+                                           id="individual-filter-orderId" placeholder="Enter Order ID">
+                                    <button class="btn btn-sm btn-outline-secondary ms-2" onclick="clearIndividualFilter('orderId')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </th>
+                        </tr>
+                        <tr class="individual-filter-row" id="filter-row-monetaryValue" style="display: none;">
+                            <th colspan="14">
+                                <div class="individual-filter-container">
+                                    <label class="filter-label">Monetary Value Range:</label>
+                                    <input type="number" class="form-control form-control-sm individual-filter-input me-2" 
+                                           id="individual-filter-valueMin" placeholder="Min $">
+                                    <input type="number" class="form-control form-control-sm individual-filter-input" 
+                                           id="individual-filter-valueMax" placeholder="Max $">
+                                    <button class="btn btn-sm btn-outline-secondary ms-2" onclick="clearIndividualFilter('monetaryValue')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </th>
+                        </tr>
+                        <tr class="individual-filter-row" id="filter-row-clientId" style="display: none;">
+                            <th colspan="14">
+                                <div class="individual-filter-container">
+                                    <label class="filter-label">Search Client ID:</label>
+                                    <input type="text" class="form-control form-control-sm individual-filter-input" 
+                                           id="individual-filter-clientId" placeholder="Enter Client ID">
+                                    <button class="btn btn-sm btn-outline-secondary ms-2" onclick="clearIndividualFilter('clientId')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </th>
+                        </tr>
+                        <tr class="individual-filter-row" id="filter-row-orderLink" style="display: none;">
+                            <th colspan="14">
+                                <div class="individual-filter-container">
+                                    <label class="filter-label">Search Order Link:</label>
+                                    <input type="text" class="form-control form-control-sm individual-filter-input" 
+                                           id="individual-filter-orderLink" placeholder="Enter Order Link">
+                                    <button class="btn btn-sm btn-outline-secondary ms-2" onclick="clearIndividualFilter('orderLink')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </th>
+                        </tr>
+                        <tr class="individual-filter-row" id="filter-row-insSheetLink" style="display: none;">
+                            <th colspan="14">
+                                <div class="individual-filter-container">
+                                    <label class="filter-label">Search Sheet Link:</label>
+                                    <input type="text" class="form-control form-control-sm individual-filter-input" 
+                                           id="individual-filter-insSheetLink" placeholder="Enter Sheet Link">
+                                    <button class="btn btn-sm btn-outline-secondary ms-2" onclick="clearIndividualFilter('insSheetLink')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </th>
+                        </tr>
+                        <tr class="individual-filter-row" id="filter-row-orderStatus" style="display: none;">
+                            <th colspan="14">
+                                <div class="individual-filter-container">
+                                    <label class="filter-label">Order Status:</label>
+                                    <select class="form-select form-select-sm individual-filter-input" id="individual-filter-orderStatus">
+                                        <option value="">All Status</option>
+                                        <option value="wip">WIP</option>
+                                        <option value="delivered">Delivered</ delivered>
+                                        <option value="nra">NRA</option>
+                                        <option value="revision">Revision</option>
+                                        <option value="cancelled">Cancelled</option>
+                                    </select>
+                                    <button class="btn btn-sm btn-outline-secondary ms-2" onclick="clearIndividualFilter('orderStatus')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </th>
+                        </tr>
+                        <tr class="individual-filter-row" id="filter-row-revision" style="display: none;">
+                            <th colspan="14">
+                                <div class="individual-filter-container">
+                                    <label class="filter-label">Revision Number:</label>
+                                    <input type="number" class="form-control form-control-sm individual-filter-input" 
+                                           id="individual-filter-revision" placeholder="Enter Revision #">
+                                    <button class="btn btn-sm btn-outline-secondary ms-2" onclick="clearIndividualFilter('revision')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="orderTableBody">
+                        <!-- Table rows will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

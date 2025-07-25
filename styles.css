@@ -1,0 +1,491 @@
+body {
+  background-color: #f8f9fa;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.header-section {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stats-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.stats-card h3 {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.stats-card .subtitle {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.stats-icon {
+  width: 60px;
+  height: 60px;
+  background: #e9ecef;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 15px;
+}
+
+.table-container {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.table th {
+  background-color: #f8f9fa;
+  border: none;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 8px;
+  white-space: nowrap;
+  vertical-align: top;
+}
+
+.table td {
+  border: none;
+  padding: 12px 8px;
+  font-size: 0.85rem;
+  vertical-align: middle;
+}
+
+.table tbody tr {
+  border-bottom: 1px solid #e9ecef;
+}
+
+.table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* Header with sorting and filter icons */
+.header-row th {
+  position: relative;
+  padding: 12px 8px 8px 8px;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+
+.header-icons {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.sortable:hover {
+  background-color: #e9ecef;
+}
+
+.sort-icon {
+  font-size: 0.7rem;
+  color: #6c757d;
+  margin-left: 5px;
+}
+
+.filter-icon {
+  font-size: 0.7rem;
+  color: #007bff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 2px;
+  border-radius: 3px;
+}
+
+.filter-icon:hover {
+  color: #0056b3;
+  background-color: rgba(0, 123, 255, 0.1);
+}
+
+.filter-icon.active {
+  color: #28a745;
+  background-color: rgba(40, 167, 69, 0.1);
+}
+
+.sort-asc .sort-icon {
+  color: #007bff;
+}
+
+.sort-desc .sort-icon {
+  color: #007bff;
+}
+
+/* Individual Filter Rows */
+.individual-filter-row {
+  background-color: #f8f9fa;
+  border-top: 2px solid #007bff;
+}
+
+.individual-filter-row th {
+  padding: 15px;
+  background-color: #f8f9fa;
+}
+
+.individual-filter-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-label {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0;
+  min-width: 120px;
+}
+
+.individual-filter-input {
+  font-size: 0.85rem;
+  height: 32px;
+  min-width: 200px;
+}
+
+.individual-filter-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Status badges */
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.status-badge:hover {
+  transform: scale(1.05);
+}
+
+.status-wip {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-delivered {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-nra {
+  background-color: #ffeaa7;
+  color: #d63031;
+}
+
+.status-revision {
+  background-color: #ddd6fe;
+  color: #5b21b6;
+}
+
+.status-cancelled {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* Add revision badge styling */
+.revision-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background-color: #e3f2fd;
+  color: #1565c0;
+  transition: all 0.2s ease;
+}
+
+.revision-badge:hover {
+  transform: scale(1.05);
+}
+
+.filter-section {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+  background-color: #495057;
+  border-color: #495057;
+}
+
+.btn-primary:hover {
+  background-color: #343a40;
+  border-color: #343a40;
+}
+
+.form-select,
+.form-control {
+  font-size: 0.9rem;
+}
+
+.table-responsive {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.link-cell {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.link-cell a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.link-cell a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .container-fluid {
+    padding: 10px;
+  }
+
+  .stats-card {
+    margin-bottom: 15px;
+  }
+
+  .table-responsive {
+    font-size: 0.8rem;
+  }
+
+  .filter-section .row {
+    gap: 10px;
+  }
+
+  .individual-filter-input {
+    font-size: 0.75rem;
+    height: 28px;
+    min-width: 150px;
+  }
+
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .header-icons {
+    align-self: flex-end;
+  }
+
+  .individual-filter-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filter-label {
+    min-width: auto;
+  }
+}
+
+/* Loading state */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Custom scrollbar */
+.table-responsive::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Animation for status badges */
+.status-badge {
+  transition: all 0.2s ease;
+}
+
+.status-badge:hover {
+  transform: scale(1.05);
+}
+
+/* Focus styles */
+.form-control:focus,
+.form-select:focus {
+  border-color: #495057;
+  box-shadow: 0 0 0 0.2rem rgba(73, 80, 87, 0.25);
+}
+
+/* Print styles */
+@media print {
+  .filter-section,
+  .btn,
+  .individual-filter-row {
+    display: none !important;
+  }
+
+  .table-container {
+    box-shadow: none;
+  }
+
+  .table {
+    font-size: 0.7rem;
+  }
+}
+
+/* Sticky header */
+.table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.individual-filter-row th {
+  position: sticky;
+  top: 45px;
+  z-index: 9;
+}
+
+/* No data message */
+.no-data {
+  text-align: center;
+  padding: 40px;
+  color: #6c757d;
+}
+
+.no-data i {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  opacity: 0.5;
+}
+
+/* Tooltip styling */
+.tooltip {
+  font-size: 0.75rem;
+}
+
+/* Header spacing */
+.header-content span {
+  margin-right: 8px;
+}
+
+/* Filter animation */
+.individual-filter-row {
+  transition: all 0.3s ease;
+}
+
+/* Active filter indicator */
+.filter-active {
+  position: relative;
+}
+
+.filter-active::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 6px;
+  height: 6px;
+  background-color: #28a745;
+  border-radius: 50%;
+}
+
+/* Add styles for record count display */
+.record-count {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+}
+
+.record-count .badge {
+  padding: 8px 12px;
+  font-size: 0.9rem;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+  border-color: #bd2130;
+  color: white;
+}
+
+.btn-danger:focus {
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.table-header-section {
+  background: white;
+  padding: 15px;
+  border-radius: 8px 8px 0 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+/* Keep the individual date input styling: */
+.individual-filter-input[type="date"] {
+  min-width: 150px;
+  cursor: pointer;
+}
+
+.individual-filter-input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+.individual-filter-input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  background-color: rgba(0, 123, 255, 0.1);
+}
+/* Responsive date picker */
+@media (max-width: 768px) {
+  .date-picker-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+
+  .individual-filter-input[type="date"] {
+    min-width: 120px;
+  }
+}
